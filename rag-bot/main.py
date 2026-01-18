@@ -20,11 +20,26 @@ def load_resources():
 model, index, documents = load_resouce()
 
 
-def ask_question(question):
-    embedding = model.encode([question])
-    _, indices = index.search(np.array(embedding), k=1)
-    return documents[indices[0][0]]["text"]
+#def ask_question(question):
+#    if not question or not question.strip():
+#        return "Please ask a valid question."
 
+#    embedding = model.encode([question])
+#    _, indices = index.search(np.array(embedding), k=3)
+#    return documents[indices[0][0]]["text"]
+
+def ask_question(question, threshold=1.0):
+    embedding = model.encode([question])
+    embedding = np.array(embedding).astype("float32")
+
+    distances, indices = index.search(embedding, k=5)
+
+    distance = distances[0][0]
+    doc_index = indices[0][0]
+
+    # Confidence check
+    if distance > threshold:
+        return "i dont know."
 
 st.title("MY rag bot")
 
